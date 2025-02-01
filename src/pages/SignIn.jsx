@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { useAuthContext } from "../context/authcontext.jsx";
 import Button from "../components/ui/Button.jsx";
 import Input from "../components/ui/Input";
 import GoogleIcon from "../assets/googleicon.svg";
 import { useNavigate } from "react-router-dom";
+import { signInWithEmail, signInWithGoogle } from "../services/authService.js";
 
 export const SignInPage = () => {
   const [formData, setFormData] = useState({
@@ -11,9 +11,9 @@ export const SignInPage = () => {
     password: "",
   });
 
-  const [errors, setErrors] = useState({});
-  const { signInUser, handleGoogleSignUp } = useAuthContext();
+  const [errors, setErrors] = useState(null);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,24 +33,38 @@ export const SignInPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrors(null);
+    setLoading(true);
+
     if (validateForm()) {
       try {
-        await signInUser(formData.email, formData.password);
-        navigate("/home");
+        const userCredential = await signInWithEmail(
+          formData.email,
+          formData.password
+        );
+        console.log(userCredential.user);
+
+        navigate("/dashboard");
       } catch (error) {
         setErrors({ email: "Invalid email or password" });
         console.error("Sign-in error:", error.message);
+      } finally {
+        setLoading(false);
       }
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const GoogleSignIn = async () => {
+    setErrors(null);
+    setLoading(true);
     try {
-      await handleGoogleSignUp();
-      navigate("/home");
+      await signInWithGoogle();
+      navigate("/dashboard");
     } catch (error) {
       console.error("Google Sign-in error:", error.message);
       setErrors({ google: "Google sign-in failed. Please try again." });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,8 +73,8 @@ export const SignInPage = () => {
       <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
         <h2 className="text-2xl font-bold text-center mb-6">Welcome Back</h2>
 
-        {errors.google && (
-          <p className="text-red-500 text-center mb-4">{errors.google}</p>
+        {errors && typeof errors === "string" && (
+          <p className="text-red-500 text-center mb-4">{errors}</p>
         )}
 
         <form onSubmit={handleSubmit}>
@@ -80,8 +94,13 @@ export const SignInPage = () => {
             onChange={handleChange}
             placeholder="Enter your password"
           />
-          <Button type="submit" variant="primary" className="w-full mt-4">
-            Sign In
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full mt-4"
+            disabled={loading}
+          >
+            {loading ? "Signing in..." : "SignIn"}
           </Button>
         </form>
 
@@ -92,12 +111,13 @@ export const SignInPage = () => {
         </div>
 
         <Button
-          onClick={handleGoogleSignIn}
+          onClick={GoogleSignIn}
           variant="secondary"
           className="w-full flex items-center justify-center gap-2"
+          disabled={loading}
         >
           <img src={GoogleIcon} alt="Google Icon" width={22} />
-          Sign In with Google
+          <p>{loading ? "Signing in..." : "Sign In with Google"}</p>
         </Button>
 
         <div className="flex justify-between mt-4 text-sm">

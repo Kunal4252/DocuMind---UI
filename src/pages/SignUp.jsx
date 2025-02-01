@@ -1,18 +1,18 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input.jsx";
-import { useAuthContext } from "../context/authcontext.jsx";
+import { signUpWithEmail, signInWithGoogle } from "../services/authService.js";
 import { useNavigate } from "react-router-dom";
 import GoogleIcon from "../assets/googleicon.svg";
 
 export const SignUpPage = () => {
-  const { signUpUser, handleGoogleSignUp } = useAuthContext();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
   });
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -35,25 +35,35 @@ export const SignUpPage = () => {
   const handleEmailSignUp = async (e) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
     if (validateForm()) {
       try {
-        await signUpUser(formData.email, formData.password);
-        alert("Signup successful!");
-        navigate("/auth/sign-in");
+        const userCredential = await signUpWithEmail(
+          formData.email,
+          formData.password
+        );
+        console.log(userCredential.user);
+        navigate("/dashboard");
       } catch (error) {
         setError(error.message || "An unknown error occurred");
+      } finally {
+        setLoading(false);
       }
     }
   };
 
-  const handleGoogleSignup = async () => {
+  const handleGoogleSignUp = async () => {
+    setError(null);
+    setLoading(true);
     try {
-      await handleGoogleSignUp();
-      alert("Signed up successfully with Google!");
-      navigate("/home");
+      const userCredential = await signInWithGoogle();
+      console.log(userCredential.user);
+      navigate("/dashboard");
     } catch (error) {
       setError(error.message || "An unknown error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -94,8 +104,13 @@ export const SignUpPage = () => {
               onChange={handleChange}
             />
           </div>
-          <Button type="submit" variant="primary" className="w-full mt-4">
-            Create Account
+          <Button
+            type="submit"
+            variant="primary"
+            className="w-full mt-4"
+            disabled={loading}
+          >
+            {loading ? "Creating Account..." : "Create Account"}
           </Button>
           <p className="text-center text-sm text-gray-600 mt-4">
             Already have an account?{" "}
@@ -112,12 +127,13 @@ export const SignUpPage = () => {
         </div>
 
         <Button
-          onClick={handleGoogleSignup}
+          onClick={handleGoogleSignUp}
           variant="secondary"
           className="w-full flex items-center justify-center gap-2"
+          disabled={loading}
         >
           <img src={GoogleIcon} alt="Google Icon" width={22} />
-          Sign Up with Google
+          <p>{loading ? "Signing in..." : "Continue with Google"}</p>
         </Button>
       </div>
     </div>
