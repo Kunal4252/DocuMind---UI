@@ -58,11 +58,11 @@ export const SignInPage = () => {
     setErrors(null);
     setLoading(true);
     try {
-      await signInWithGoogle();
+      const response = await signInWithGoogle();
+      console.log(response);
       navigate("/dashboard");
     } catch (error) {
-      console.error("Google Sign-in error:", error.message);
-      setErrors({ google: "Google sign-in failed. Please try again." });
+      setErrors(error.message || "An unknown error occurred");
     } finally {
       setLoading(false);
     }
