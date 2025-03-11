@@ -46,11 +46,27 @@ export const SignInPage = () => {
 
         navigate("/dashboard");
       } catch (error) {
-        setErrors({ email: "Invalid email or password" });
         console.error("Sign-in error:", error.message);
+
+        // Map Firebase error messages to user-friendly messages
+        let errorMessage = "Invalid email or password";
+        if (error.code === "auth/user-not-found") {
+          errorMessage = "No account found with this email";
+        } else if (error.code === "auth/wrong-password") {
+          errorMessage = "Incorrect password";
+        } else if (error.code === "auth/invalid-credential") {
+          errorMessage = "Invalid credentials";
+        } else if (error.code === "auth/too-many-requests") {
+          errorMessage =
+            "Too many failed login attempts. Please try again later";
+        }
+
+        setErrors({ general: errorMessage });
       } finally {
         setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
   };
 
@@ -62,7 +78,8 @@ export const SignInPage = () => {
       console.log(response);
       navigate("/dashboard");
     } catch (error) {
-      setErrors(error.message || "An unknown error occurred");
+      console.error("Google sign-in error:", error);
+      setErrors({ general: error.message || "Failed to sign in with Google" });
     } finally {
       setLoading(false);
     }
@@ -73,8 +90,10 @@ export const SignInPage = () => {
       <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
         <h2 className="text-2xl font-bold text-center mb-6">Welcome Back</h2>
 
-        {errors && typeof errors === "string" && (
-          <p className="text-red-500 text-center mb-4">{errors}</p>
+        {errors && errors.general && (
+          <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 mb-4">
+            {errors.general}
+          </div>
         )}
 
         <form onSubmit={handleSubmit}>
@@ -85,6 +104,7 @@ export const SignInPage = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder="Enter your email"
+            error={errors?.email}
           />
           <Input
             label="Password"
@@ -93,14 +113,15 @@ export const SignInPage = () => {
             value={formData.password}
             onChange={handleChange}
             placeholder="Enter your password"
+            error={errors?.password}
           />
           <Button
             type="submit"
             variant="primary"
             className="w-full mt-4"
-            disabled={loading}
+            loading={loading}
           >
-            {loading ? "Signing in..." : "SignIn"}
+            {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
 
@@ -114,7 +135,7 @@ export const SignInPage = () => {
           onClick={GoogleSignIn}
           variant="secondary"
           className="w-full flex items-center justify-center gap-2"
-          disabled={loading}
+          loading={loading}
         >
           <img src={GoogleIcon} alt="Google Icon" width={22} />
           <p>{loading ? "Signing in..." : "Sign In with Google"}</p>

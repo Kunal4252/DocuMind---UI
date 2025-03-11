@@ -28,8 +28,12 @@ export const SignUpPage = () => {
     if (formData.password !== formData.confirmPassword)
       newErrors.confirmPassword = "Passwords do not match.";
     if (!formData.name) newErrors.name = "Name is required";
-    setError(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    if (Object.keys(newErrors).length > 0) {
+      setError(newErrors);
+      return false;
+    }
+    return true;
   };
 
   const handleChange = (e) => {
@@ -50,10 +54,31 @@ export const SignUpPage = () => {
         console.log(response);
         navigate("/dashboard");
       } catch (error) {
-        setError(error.message || "An unknown error occurred");
+        console.error("Sign-up error:", error);
+
+        // Map Firebase error messages to user-friendly messages
+        let errorMessage = "Failed to create account";
+        if (error.code === "auth/email-already-in-use") {
+          errorMessage =
+            "This email is already registered. Please sign in instead.";
+        } else if (error.code === "auth/invalid-email") {
+          errorMessage = "Please enter a valid email address";
+        } else if (error.code === "auth/weak-password") {
+          errorMessage =
+            "Password is too weak. Please use at least 6 characters";
+        } else if (error.code === "auth/network-request-failed") {
+          errorMessage =
+            "Network error. Please check your connection and try again";
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        setError({ general: errorMessage });
       } finally {
         setLoading(false);
       }
+    } else {
+      setLoading(false);
     }
   };
 
@@ -65,7 +90,8 @@ export const SignUpPage = () => {
       console.log(response);
       navigate("/dashboard");
     } catch (error) {
-      setError(error.message || "An unknown error occurred");
+      console.error("Google sign-up error:", error);
+      setError({ general: error.message || "Failed to sign up with Google" });
     } finally {
       setLoading(false);
     }
@@ -79,6 +105,26 @@ export const SignUpPage = () => {
         {error && typeof error === "string" && (
           <p className="text-red-500 mb-4">{error}</p>
         )}
+
+        {error && error.general && (
+          <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 mb-4">
+            {error.general}
+          </div>
+        )}
+
+        {error &&
+          typeof error === "object" &&
+          !error.general &&
+          Object.keys(error).length > 0 && (
+            <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 mb-4">
+              <ul className="list-disc pl-4">
+                {Object.entries(error).map(([field, message]) => (
+                  <li key={field}>{message}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
         <form onSubmit={handleEmailSignUp}>
           <div>
             <Input
@@ -88,6 +134,7 @@ export const SignUpPage = () => {
               placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
+              error={error?.email}
             />
             <Input
               label="Password"
@@ -96,6 +143,7 @@ export const SignUpPage = () => {
               placeholder="Enter your password"
               value={formData.password}
               onChange={handleChange}
+              error={error?.password}
             />
             <Input
               label="Confirm Password"
@@ -104,6 +152,7 @@ export const SignUpPage = () => {
               placeholder="Re-enter your password"
               value={formData.confirmPassword}
               onChange={handleChange}
+              error={error?.confirmPassword}
             />
             <Input
               label="Name"
@@ -112,6 +161,7 @@ export const SignUpPage = () => {
               placeholder="Enter your name"
               value={formData.name}
               onChange={handleChange}
+              error={error?.name}
             />
             <Input
               label="Phone"
@@ -120,6 +170,7 @@ export const SignUpPage = () => {
               placeholder="Enter your phone number"
               value={formData.phone}
               onChange={handleChange}
+              error={error?.phone}
             />
             <Input
               label="Location"
@@ -128,6 +179,7 @@ export const SignUpPage = () => {
               placeholder="Enter your location"
               value={formData.location}
               onChange={handleChange}
+              error={error?.location}
             />
             <Input
               label="Bio"
@@ -136,13 +188,14 @@ export const SignUpPage = () => {
               placeholder="Enter a short bio"
               value={formData.bio}
               onChange={handleChange}
+              error={error?.bio}
             />
           </div>
           <Button
             type="submit"
             variant="primary"
             className="w-full mt-4"
-            disabled={loading}
+            loading={loading}
           >
             {loading ? "Creating Account..." : "Create Account"}
           </Button>
@@ -158,7 +211,7 @@ export const SignUpPage = () => {
           onClick={handleGoogleSignUp}
           variant="secondary"
           className="w-full flex items-center justify-center gap-2"
-          disabled={loading}
+          loading={loading}
         >
           <img src={GoogleIcon} alt="Google Icon" width={22} />
           <p>{loading ? "Signing in..." : "Continue with Google"}</p>
