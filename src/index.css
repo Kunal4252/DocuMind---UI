@@ -1,3 +1,46 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  --secondary-gradient: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --error-gradient: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  --bg-gradient: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300;
+  }
+
+  .gradient-primary {
+    background: var(--primary-gradient);
+  }
+
+  .gradient-secondary {
+    background: var(--secondary-gradient);
+  }
+
+  .btn-primary {
+    @apply px-6 py-2.5 rounded-lg font-medium text-white transition-all duration-300;
+    background: var(--primary-gradient);
+  }
+
+  .btn-primary:hover {
+    @apply shadow-lg shadow-indigo-500/30 -translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-2.5 rounded-lg font-medium bg-white border border-gray-200 transition-all duration-300;
+  }
+
+  .btn-secondary:hover {
+    @apply shadow-md -translate-y-0.5;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200;
+  }
+}

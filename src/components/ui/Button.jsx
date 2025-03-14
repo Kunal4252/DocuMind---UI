@@ -7,17 +7,14 @@ const Button = ({
   loading = false,
   ...props
 }) => {
-  const baseClasses =
-    "px-4 py-2 rounded-md font-semibold text-sm transition-colors duration-200 relative";
   const variantClasses = {
-    primary: "bg-blue-500 text-white hover:bg-blue-600 disabled:bg-blue-300",
-    secondary:
-      "bg-gray-200 text-gray-800 hover:bg-gray-300 disabled:bg-gray-100",
+    primary: "btn-primary",
+    secondary: "btn-secondary",
   };
 
   return (
     <button
-      className={`${baseClasses} ${variantClasses[variant]}`}
+      className={`${variantClasses[variant]} ${props.className || ""}`}
       disabled={props.disabled || loading}
       {...props}
     >

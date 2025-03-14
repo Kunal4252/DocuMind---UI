@@ -38,9 +38,18 @@ export const signUpWithEmail = async (email, password, userData) => {
 };
 
 export const signInWithEmail = async (email, password) => {
-  return await signInWithEmailAndPassword(auth, email, password);
+  try {
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    return userCredential.user;
+  } catch (error) {
+    console.error("Error signing in with email:", error);
+    throw new Error(error.message || "Failed to sign in");
+  }
 };
-
 export const signInWithGoogle = async () => {
   try {
     const userCredential = await signInWithPopup(auth, googleProvider);
@@ -63,5 +72,10 @@ export const signInWithGoogle = async () => {
 };
 
 export const logout = async () => {
-  return await signOut(auth);
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw new Error(error.message || "Failed to log out");
+  }
 };

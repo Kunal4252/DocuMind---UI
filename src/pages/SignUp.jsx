@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input.jsx";
 import { signUpWithEmail, signInWithGoogle } from "../services/authService.js";
-import { useNavigate } from "react-router-dom";
-import GoogleIcon from "../assets/googleicon.svg"; // Add a Google icon for the button
+import { useNavigate, Link } from "react-router-dom";
+import GoogleIcon from "../assets/googleicon.svg";
 
 export const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -98,131 +98,169 @@ export const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
-        <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
+    <div className="min-h-screen py-12 bg-gradient-to-b from-indigo-50 to-white">
+      <div className="max-w-xl mx-auto px-4">
+        <div className="card p-8 overflow-hidden relative">
+          <div className="absolute top-0 left-0 w-full h-1 gradient-primary"></div>
 
-        {error && typeof error === "string" && (
-          <p className="text-red-500 mb-4">{error}</p>
-        )}
+          <h2 className="text-2xl font-bold text-center mb-6 bg-clip-text text-transparent gradient-primary">
+            Create Your Account
+          </h2>
 
-        {error && error.general && (
-          <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 mb-4">
-            {error.general}
-          </div>
-        )}
-
-        {error &&
-          typeof error === "object" &&
-          !error.general &&
-          Object.keys(error).length > 0 && (
-            <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 mb-4">
-              <ul className="list-disc pl-4">
-                {Object.entries(error).map(([field, message]) => (
-                  <li key={field}>{message}</li>
-                ))}
-              </ul>
+          {error && error.general && (
+            <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2 text-red-500"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {error.general}
             </div>
           )}
 
-        <form onSubmit={handleEmailSignUp}>
-          <div>
-            <Input
-              label="Email"
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-              error={error?.email}
-            />
-            <Input
-              label="Password"
-              type="password"
-              name="password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleChange}
-              error={error?.password}
-            />
-            <Input
-              label="Confirm Password"
-              type="password"
-              name="confirmPassword"
-              placeholder="Re-enter your password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              error={error?.confirmPassword}
-            />
-            <Input
-              label="Name"
-              type="text"
-              name="name"
-              placeholder="Enter your name"
-              value={formData.name}
-              onChange={handleChange}
-              error={error?.name}
-            />
-            <Input
-              label="Phone"
-              type="text"
-              name="phone"
-              placeholder="Enter your phone number"
-              value={formData.phone}
-              onChange={handleChange}
-              error={error?.phone}
-            />
-            <Input
-              label="Location"
-              type="text"
-              name="location"
-              placeholder="Enter your location"
-              value={formData.location}
-              onChange={handleChange}
-              error={error?.location}
-            />
-            <Input
-              label="Bio"
-              type="text"
-              name="bio"
-              placeholder="Enter a short bio"
-              value={formData.bio}
-              onChange={handleChange}
-              error={error?.bio}
-            />
+          {error &&
+            typeof error === "object" &&
+            !error.general &&
+            Object.keys(error).length > 0 && (
+              <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100">
+                <ul className="list-disc pl-4">
+                  {Object.entries(error).map(([field, message]) => (
+                    <li key={field} className="text-sm">
+                      {message}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+          <form onSubmit={handleEmailSignUp} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <Input
+                  label="Email"
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  error={error?.email}
+                />
+              </div>
+              <div className="col-span-2 md:col-span-1">
+                <Input
+                  label="Password"
+                  type="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  error={error?.password}
+                />
+              </div>
+              <div className="col-span-2 md:col-span-1">
+                <Input
+                  label="Confirm Password"
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="Re-enter your password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  error={error?.confirmPassword}
+                />
+              </div>
+              <div className="col-span-2">
+                <Input
+                  label="Full Name"
+                  type="text"
+                  name="name"
+                  placeholder="Enter your full name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  error={error?.name}
+                />
+              </div>
+              <div className="col-span-2 md:col-span-1">
+                <Input
+                  label="Phone (Optional)"
+                  type="text"
+                  name="phone"
+                  placeholder="Enter your phone number"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  error={error?.phone}
+                />
+              </div>
+              <div className="col-span-2 md:col-span-1">
+                <Input
+                  label="Location (Optional)"
+                  type="text"
+                  name="location"
+                  placeholder="Enter your location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  error={error?.location}
+                />
+              </div>
+              <div className="col-span-2">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Bio (Optional)
+                  </label>
+                  <textarea
+                    name="bio"
+                    rows="3"
+                    placeholder="Tell us a bit about yourself"
+                    value={formData.bio}
+                    onChange={handleChange}
+                    className="input-field"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-full mt-6"
+              loading={loading}
+            >
+              {loading ? "Creating Account..." : "Create Account"}
+            </Button>
+          </form>
+
+          <div className="flex items-center my-6">
+            <div className="flex-1 h-px bg-gray-200"></div>
+            <p className="mx-4 text-sm text-gray-400">or</p>
+            <div className="flex-1 h-px bg-gray-200"></div>
           </div>
+
           <Button
-            type="submit"
-            variant="primary"
-            className="w-full mt-4"
+            onClick={handleGoogleSignUp}
+            variant="secondary"
+            className="w-full flex items-center justify-center gap-2"
             loading={loading}
           >
-            {loading ? "Creating Account..." : "Create Account"}
+            <img src={GoogleIcon} alt="Google Icon" width={20} height={20} />
+            <span>{loading ? "Signing up..." : "Continue with Google"}</span>
           </Button>
-        </form>
 
-        <div className="flex items-center justify-center my-4">
-          <span className="w-1/3 border-b"></span>
-          <span className="px-2 text-sm text-gray-500">or</span>
-          <span className="w-1/3 border-b"></span>
+          <p className="mt-8 text-center text-sm text-gray-500">
+            Already have an account?{" "}
+            <Link
+              to="/auth/sign-in"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Sign in
+            </Link>
+          </p>
         </div>
-
-        <Button
-          onClick={handleGoogleSignUp}
-          variant="secondary"
-          className="w-full flex items-center justify-center gap-2"
-          loading={loading}
-        >
-          <img src={GoogleIcon} alt="Google Icon" width={22} />
-          <p>{loading ? "Signing in..." : "Continue with Google"}</p>
-        </Button>
-
-        <p className="text-center text-sm text-gray-600 mt-4">
-          Already have an account?{" "}
-          <a href="/auth/sign-in" className="text-blue-500 hover:underline">
-            Sign In
-          </a>
-        </p>
       </div>
     </div>
   );

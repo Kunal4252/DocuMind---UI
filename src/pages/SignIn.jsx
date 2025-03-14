@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Button from "../components/ui/Button.jsx";
 import Input from "../components/ui/Input";
 import GoogleIcon from "../assets/googleicon.svg";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { signInWithEmail, signInWithGoogle } from "../services/authService.js";
 
 export const SignInPage = () => {
@@ -86,68 +86,97 @@ export const SignInPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white shadow-md rounded-lg p-8">
-        <h2 className="text-2xl font-bold text-center mb-6">Welcome Back</h2>
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-indigo-50 to-white">
+      <div className="w-full max-w-md">
+        <div className="card p-8 overflow-hidden relative">
+          <div className="absolute top-0 left-0 w-full h-1 gradient-primary"></div>
 
-        {errors && errors.general && (
-          <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-3 mb-4">
-            {errors.general}
+          <h2 className="text-2xl font-bold text-center mb-8 bg-clip-text text-transparent gradient-primary">
+            Welcome Back
+          </h2>
+
+          {errors && errors.general && (
+            <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-100 flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2 text-red-500"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {errors.general}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Input
+              label="Email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter your email"
+              error={errors?.email}
+            />
+            <Input
+              label="Password"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Enter your password"
+              error={errors?.password}
+            />
+
+            <div className="mt-2 mb-6 text-right">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-indigo-600 hover:text-indigo-500"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-full"
+              loading={loading}
+            >
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+
+          <div className="flex items-center my-6">
+            <div className="flex-1 h-px bg-gray-200"></div>
+            <p className="mx-4 text-sm text-gray-400">or</p>
+            <div className="flex-1 h-px bg-gray-200"></div>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit}>
-          <Input
-            label="Email"
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Enter your email"
-            error={errors?.email}
-          />
-          <Input
-            label="Password"
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Enter your password"
-            error={errors?.password}
-          />
           <Button
-            type="submit"
-            variant="primary"
-            className="w-full mt-4"
+            onClick={GoogleSignIn}
+            variant="secondary"
+            className="w-full flex items-center justify-center gap-2"
             loading={loading}
           >
-            {loading ? "Signing in..." : "Sign In"}
+            <img src={GoogleIcon} alt="Google Icon" width={20} height={20} />
+            <span>{loading ? "Signing in..." : "Sign in with Google"}</span>
           </Button>
-        </form>
 
-        <div className="flex items-center justify-center my-4">
-          <span className="w-1/3 border-b"></span>
-          <span className="px-2 text-sm text-gray-500">or</span>
-          <span className="w-1/3 border-b"></span>
-        </div>
-
-        <Button
-          onClick={GoogleSignIn}
-          variant="secondary"
-          className="w-full flex items-center justify-center gap-2"
-          loading={loading}
-        >
-          <img src={GoogleIcon} alt="Google Icon" width={22} />
-          <p>{loading ? "Signing in..." : "Sign In with Google"}</p>
-        </Button>
-
-        <div className="flex justify-between mt-4 text-sm">
-          <a href="/forgot-password" className="text-blue-500 hover:underline">
-            Forgot Password?
-          </a>
-          <a href="/auth/sign-up" className="text-blue-500 hover:underline">
-            Create Account
-          </a>
+          <p className="mt-8 text-center text-sm text-gray-500">
+            Don't have an account?{" "}
+            <Link
+              to="/auth/sign-up"
+              className="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Create account
+            </Link>
+          </p>
         </div>
       </div>
     </div>
