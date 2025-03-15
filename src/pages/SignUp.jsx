@@ -244,11 +244,19 @@ export const SignUpPage = () => {
           <Button
             onClick={handleGoogleSignUp}
             variant="secondary"
-            className="w-full flex items-center justify-center gap-2"
+            className="w-full"
             loading={loading}
           >
-            <img src={GoogleIcon} alt="Google Icon" width={20} height={20} />
-            <span>{loading ? "Signing up..." : "Continue with Google"}</span>
+            <div className="flex items-center justify-center gap-2">
+              <img
+                src={GoogleIcon}
+                alt="Google Icon"
+                width={20}
+                height={20}
+                className="flex-shrink-0"
+              />
+              <span>{loading ? "Signing up..." : "Continue with Google"}</span>
+            </div>
           </Button>
 
           <p className="mt-8 text-center text-sm text-gray-500">
