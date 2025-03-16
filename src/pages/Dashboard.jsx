@@ -1,181 +1,150 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "../components/ui/Button";
-import { useAuth } from "../hooks/useAuth";
-import { logout } from "../services/authService";
-import LoadingSpinner from "../components/ui/LoadingSpinner";
+import { useDocuments } from "../context/DocumentContext";
+import MainLayout from "../components/layouts/MainLayout";
+import NewChatModal from "../components/NewChatModal";
+import { format } from "date-fns";
 
 export const Dashboard = () => {
-  const { user, loading } = useAuth();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [activeTab, setActiveTab] = useState("documents");
+  const { documents, loading, error, refreshDocuments, selectDocument } =
+    useDocuments();
+  const [showNewChatModal, setShowNewChatModal] = useState(false);
   const navigate = useNavigate();
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
-
-  const handleLogout = async () => {
-    try {
-      setIsLoggingOut(true);
-      await logout();
-      navigate("/auth/sign-in");
-    } catch (error) {
-      console.error("Logout error:", error.message);
-    } finally {
-      setIsLoggingOut(false);
-    }
+  const handleNewChat = () => {
+    setShowNewChatModal(true);
   };
 
-  // Sample data for demo purposes
-  const recentDocuments = [
-    { id: 1, name: "Project Proposal", type: "PDF", date: "2023-05-10" },
-    { id: 2, name: "Meeting Notes", type: "DOCX", date: "2023-05-08" },
-    { id: 3, name: "Financial Report", type: "XLSX", date: "2023-05-05" },
-    { id: 4, name: "Technical Documentation", type: "PDF", date: "2023-05-02" },
-  ];
+  const handleSelectDocument = (documentId) => {
+    selectDocument(documentId);
+    navigate("/chat");
+  };
 
-  const stats = [
-    { label: "Documents", value: 24 },
-    { label: "Analyzed", value: 18 },
-    { label: "Shared", value: 7 },
-  ];
+  const handleCloseModal = () => {
+    setShowNewChatModal(false);
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Dashboard Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-indigo-600">DocuMind</h1>
-          <div className="flex items-center space-x-4">
-            {user && (
-              <div className="hidden md:flex items-center">
-                <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
-                  {user.email?.charAt(0).toUpperCase() || "U"}
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm font-medium text-gray-700">
-                    {user.email}
-                  </p>
-                </div>
-              </div>
-            )}
-            <Button
-              onClick={handleLogout}
-              variant="secondary"
-              loading={isLoggingOut}
-              className="text-sm"
+    <MainLayout>
+      <div className="flex flex-col h-full w-full bg-gray-50">
+        {/* Dashboard Header */}
+        <div className="flex justify-between items-center p-4 lg:px-6 border-b border-gray-200 bg-white">
+          <h1 className="text-2xl font-bold text-gray-800">Your Documents</h1>
+          <button
+            onClick={handleNewChat}
+            className="flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md transition duration-200"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              viewBox="0 0 20 20"
+              fill="currentColor"
             >
-              Sign Out
-            </Button>
-          </div>
+              <path
+                fillRule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span>New Document</span>
+          </button>
         </div>
-      </header>
 
-      {/* Dashboard Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="card p-6 hover:shadow-lg transition-all duration-300"
-            >
-              <p className="text-sm text-gray-500 font-medium">{stat.label}</p>
-              <p className="text-3xl font-bold text-indigo-600 mt-2">
-                {stat.value}
-              </p>
+        {/* Documents Grid */}
+        <div className="flex-1 overflow-y-auto p-4 lg:p-6">
+          {loading ? (
+            <div className="flex justify-center items-center h-32">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
             </div>
-          ))}
-        </div>
-
-        {/* Main Dashboard Tabs */}
-        <div className="bg-white shadow rounded-xl overflow-hidden">
-          {/* Tabs */}
-          <div className="border-b border-gray-200">
-            <nav className="flex -mb-px">
-              {["documents", "analytics", "settings"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`py-4 px-6 font-medium text-sm border-b-2 transition-colors duration-200 ${
-                    activeTab === tab
-                      ? "border-indigo-500 text-indigo-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  }`}
+          ) : error ? (
+            <div className="p-4 bg-red-50 text-red-500 rounded-lg">
+              Error loading documents. Please try again.
+            </div>
+          ) : documents.length === 0 ? (
+            <div className="bg-white p-10 rounded-lg shadow-sm text-center">
+              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8 text-indigo-600"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
                 >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
+                  <path
+                    fillRule="evenodd"
+                    d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-xl font-medium text-gray-800 mb-2">
+                No documents yet
+              </h2>
+              <p className="text-gray-500 mb-6">
+                Upload your first document to start chatting with it
+              </p>
+              <button
+                onClick={handleNewChat}
+                className="inline-flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-6 rounded-md transition duration-200"
+              >
+                <span>Upload Document</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {documents.map((doc) => (
+                <div
+                  key={doc.id}
+                  onClick={() => handleSelectDocument(doc.id)}
+                  className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer border border-gray-200"
+                >
+                  <div className="flex items-start mb-3">
+                    <div className="bg-indigo-100 p-2 rounded mr-3">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-indigo-600"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-medium text-gray-800 truncate">
+                        {doc.title}
+                      </h3>
+                      <p className="text-xs text-gray-500">
+                        {format(new Date(doc.uploaded_at), "MMM d, yyyy")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSelectDocument(doc.id);
+                      }}
+                    >
+                      Chat →
+                    </button>
+                  </div>
+                </div>
               ))}
-            </nav>
-          </div>
-
-          {/* Tab Content */}
-          <div className="p-6">
-            {activeTab === "documents" && (
-              <>
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-lg font-medium">Recent Documents</h2>
-                  <Button variant="primary" className="px-4 py-2 text-sm">
-                    Upload New
-                  </Button>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Type
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {recentDocuments.map((doc) => (
-                        <tr key={doc.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4">{doc.name}</td>
-                          <td className="px-6 py-4">{doc.type}</td>
-                          <td className="px-6 py-4">{doc.date}</td>
-                          <td className="px-6 py-4">
-                            <button className="text-indigo-600">View</button>
-                            <button className="text-indigo-600 ml-2">
-                              Edit
-                            </button>
-                            <button className="text-red-600 ml-2">
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-      </main>
+      </div>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
-        <div className="max-w-7xl mx-auto px-4 py-6 text-center">
-          <p className="text-gray-500 text-sm">
-            &copy; 2023 DocuMind. All rights reserved.
-          </p>
-        </div>
-      </footer>
-    </div>
+      {/* New Chat Modal */}
+      <NewChatModal
+        isOpen={showNewChatModal}
+        onClose={handleCloseModal}
+        onSelectDocument={handleSelectDocument}
+      />
+    </MainLayout>
   );
 };
