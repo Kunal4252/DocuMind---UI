@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "../context/UserContext";
 import { updateUserProfile, uploadProfileImage } from "../services/userService";
 
@@ -17,7 +17,7 @@ const UserProfile = () => {
   const [success, setSuccess] = useState(false);
 
   // Initialize form data when userProfile changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (userProfile) {
       setFormData({
         name: userProfile.name || "",
@@ -72,179 +72,268 @@ const UserProfile = () => {
 
   if (!userProfile) {
     return (
-      <div className="p-4 bg-white rounded-lg shadow-md">
-        <div className="flex justify-center items-center h-40">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-700"></div>
-        </div>
+      <div className="flex justify-center items-center h-40">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Your Profile</h2>
-        {!isEditing && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            Edit Profile
-          </button>
-        )}
-      </div>
-
-      {success && (
-        <div className="mb-4 p-2 bg-green-100 text-green-700 rounded">
-          Profile updated successfully!
-        </div>
-      )}
-
-      {error && (
-        <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">{error}</div>
-      )}
-
-      {isEditing ? (
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2" htmlFor="profileImage">
-              Profile Image
-            </label>
-            <div className="flex items-center space-x-4">
+    <div>
+      <div className="relative mt-6">
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center">
+            <div className="relative">
               <img
                 src={
                   userProfile.profile_image || "https://via.placeholder.com/100"
                 }
                 alt="Profile"
-                className="w-16 h-16 rounded-full object-cover"
+                className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md"
               />
-              <input
-                id="profileImage"
-                type="file"
-                onChange={handleImageChange}
-                accept="image/*"
-                className="flex-1"
-              />
+              <div className="absolute -bottom-1 -right-1 h-8 w-8 bg-white rounded-full shadow-md flex items-center justify-center">
+                <div className="h-6 w-6 rounded-full bg-gradient-to-br from-green-400 to-green-600"></div>
+              </div>
             </div>
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2" htmlFor="name">
-              Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2" htmlFor="phone">
-              Phone
-            </label>
-            <input
-              id="phone"
-              name="phone"
-              type="text"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2" htmlFor="location">
-              Location
-            </label>
-            <input
-              id="location"
-              name="location"
-              type="text"
-              value={formData.location}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-gray-700 mb-2" htmlFor="bio">
-              Bio
-            </label>
-            <textarea
-              id="bio"
-              name="bio"
-              value={formData.bio}
-              onChange={handleChange}
-              rows="3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div className="flex space-x-4">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`px-4 py-2 rounded-md text-white font-medium
-                ${
-                  isSubmitting
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                }`}
-            >
-              {isSubmitting ? "Saving..." : "Save Changes"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex items-center space-x-4">
-            <img
-              src={
-                userProfile.profile_image || "https://via.placeholder.com/100"
-              }
-              alt="Profile"
-              className="w-20 h-20 rounded-full object-cover"
-            />
-            <div>
-              <h3 className="text-xl font-semibold">{userProfile.name}</h3>
+            <div className="ml-4">
+              <h2 className="text-2xl font-bold text-gray-800">
+                {userProfile.name || "User"}
+              </h2>
               <p className="text-gray-600">{userProfile.email}</p>
             </div>
           </div>
-
-          {userProfile.phone && (
-            <div>
-              <h4 className="text-sm font-medium text-gray-500">Phone</h4>
-              <p>{userProfile.phone}</p>
-            </div>
-          )}
-
-          {userProfile.location && (
-            <div>
-              <h4 className="text-sm font-medium text-gray-500">Location</h4>
-              <p>{userProfile.location}</p>
-            </div>
-          )}
-
-          {userProfile.bio && (
-            <div>
-              <h4 className="text-sm font-medium text-gray-500">Bio</h4>
-              <p>{userProfile.bio}</p>
-            </div>
+          {!isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-md hover:from-indigo-700 hover:to-purple-700 transition shadow-sm"
+            >
+              Edit Profile
+            </button>
           )}
         </div>
-      )}
+
+        {success && (
+          <div className="mb-6 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg flex items-center">
+            <svg
+              className="h-5 w-5 mr-2"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Profile updated successfully!
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center">
+            <svg
+              className="h-5 w-5 mr-2"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {error}
+          </div>
+        )}
+
+        {isEditing ? (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="mb-6">
+              <label
+                className="block text-gray-700 font-medium mb-2"
+                htmlFor="profileImage"
+              >
+                Profile Image
+              </label>
+              <div className="flex items-center space-x-4">
+                <img
+                  src={
+                    userProfile.profile_image ||
+                    "https://via.placeholder.com/100"
+                  }
+                  alt="Profile"
+                  className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                />
+                <div className="flex-1">
+                  <input
+                    id="profileImage"
+                    type="file"
+                    onChange={handleImageChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="profileImage"
+                    className="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 cursor-pointer inline-block"
+                  >
+                    Choose Image
+                  </label>
+                  {profileImage && (
+                    <span className="ml-2 text-sm text-gray-600">
+                      {profileImage.name}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label
+                  className="block text-gray-700 font-medium mb-2"
+                  htmlFor="name"
+                >
+                  Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  className="block text-gray-700 font-medium mb-2"
+                  htmlFor="phone"
+                >
+                  Phone
+                </label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="text"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="block text-gray-700 font-medium mb-2"
+                htmlFor="location"
+              >
+                Location
+              </label>
+              <input
+                id="location"
+                name="location"
+                type="text"
+                value={formData.location}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            </div>
+
+            <div>
+              <label
+                className="block text-gray-700 font-medium mb-2"
+                htmlFor="bio"
+              >
+                Bio
+              </label>
+              <textarea
+                id="bio"
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                rows="4"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Tell us about yourself..."
+              />
+            </div>
+
+            <div className="flex space-x-4">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`px-6 py-2 rounded-lg text-white font-medium shadow-sm
+                  ${
+                    isSubmitting
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                  }`}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Saving...
+                  </div>
+                ) : (
+                  "Save Changes"
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 shadow-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {userProfile.phone && (
+                <div className="flex flex-col">
+                  <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                    Phone
+                  </h4>
+                  <p className="text-gray-800">{userProfile.phone}</p>
+                </div>
+              )}
+
+              {userProfile.location && (
+                <div className="flex flex-col">
+                  <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                    Location
+                  </h4>
+                  <p className="text-gray-800">{userProfile.location}</p>
+                </div>
+              )}
+            </div>
+
+            {userProfile.bio && (
+              <div className="mt-8">
+                <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  Bio
+                </h4>
+                <p className="text-gray-800 whitespace-pre-line">
+                  {userProfile.bio}
+                </p>
+              </div>
+            )}
+
+            {!userProfile.phone &&
+              !userProfile.location &&
+              !userProfile.bio && (
+                <div className="mt-4 p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50 text-center">
+                  <p className="text-gray-500">
+                    Your profile is empty. Click "Edit Profile" to add your
+                    information.
+                  </p>
+                </div>
+              )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
