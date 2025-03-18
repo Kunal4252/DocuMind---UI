@@ -13,7 +13,7 @@ export const useDocuments = () => {
 };
 
 export const DocumentProvider = ({ children }) => {
-  const { user } = useAuth(); // Get user from auth context
+  const { user } = useAuth();
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -37,9 +37,7 @@ export const DocumentProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       try {
-        console.log("Fetching documents...");
         const response = await getDocuments();
-        console.log("Documents fetched:", response);
         const documentsList = response.documents || [];
         setDocuments(documentsList);
 
@@ -59,7 +57,7 @@ export const DocumentProvider = ({ children }) => {
     };
 
     fetchDocuments();
-  }, [user, refreshTrigger]);
+  }, [user, refreshTrigger, selectedDocument]);
 
   // Select a document by ID
   const selectDocument = (documentId) => {
@@ -70,10 +68,6 @@ export const DocumentProvider = ({ children }) => {
 
     const doc = documents.find((d) => d.id === documentId);
     setSelectedDocument(doc || null);
-
-    if (!doc) {
-      console.warn(`Document with ID ${documentId} not found`);
-    }
   };
 
   // Clear selected document
@@ -97,3 +91,5 @@ export const DocumentProvider = ({ children }) => {
     </DocumentContext.Provider>
   );
 };
+
+export default DocumentProvider;

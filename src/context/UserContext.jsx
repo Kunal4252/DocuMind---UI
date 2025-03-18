@@ -1,9 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import { getUserProfile } from "../services/userService";
 import { useAuth } from "../hooks/useAuth";
 
+// Create a context for user profile data
 const UserContext = createContext();
 
+// Hook to use the user profile context
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
@@ -12,8 +14,9 @@ export const useUser = () => {
   return context;
 };
 
+// Provider component for user profile data
 export const UserProvider = ({ children }) => {
-  const { user } = useAuth(); // Get user from AuthContext instead of duplicating logic
+  const { user } = useAuth(); // Get user from AuthContext
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -27,14 +30,15 @@ export const UserProvider = ({ children }) => {
   // Fetch user profile when auth changes or refresh is triggered
   useEffect(() => {
     const fetchUserProfile = async () => {
-      if (!user) return;
+      if (!user) {
+        setUserProfile(null);
+        return;
+      }
 
       setLoading(true);
       setError(null);
       try {
-        console.log("Fetching user profile...");
         const profile = await getUserProfile();
-        console.log("Profile fetched:", profile);
         setUserProfile(profile);
       } catch (err) {
         console.error("Error fetching user profile:", err);
@@ -48,7 +52,6 @@ export const UserProvider = ({ children }) => {
   }, [user, refreshTrigger]);
 
   const value = {
-    currentUser: user, // Use the user from AuthContext
     userProfile,
     loading,
     error,
@@ -57,3 +60,5 @@ export const UserProvider = ({ children }) => {
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
+
+export default UserProvider;

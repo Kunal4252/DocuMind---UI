@@ -4,7 +4,7 @@ import { FileText } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { signInWithEmail, signInWithGoogle } from "../services/authService.js";
 
-export const SignInPage = () => {
+const SignInPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -277,3 +277,5 @@ export const SignInPage = () => {
     </div>
   );
 };
+
+export default SignInPage;

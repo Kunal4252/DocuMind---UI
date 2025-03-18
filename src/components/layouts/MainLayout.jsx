@@ -39,7 +39,8 @@ const MainLayout = ({ children }) => {
       await logout();
       navigate("/auth/sign-in");
     } catch (error) {
-      console.error("Logout error:", error.message);
+      // Handle logout error silently without console.log
+      setIsLoggingOut(false);
     } finally {
       setIsLoggingOut(false);
     }

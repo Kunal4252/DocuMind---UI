@@ -11,11 +11,6 @@ const getAuthHeader = async () => {
     const user = JSON.parse(userStr);
     if (!user.token) throw new Error("No token available");
 
-    console.log(
-      "Using token for API request:",
-      user.token.substring(0, 15) + "..."
-    );
-
     return {
       headers: {
         Authorization: `Bearer ${user.token}`,
@@ -31,7 +26,6 @@ const getAuthHeader = async () => {
 export const getUserProfile = async () => {
   try {
     const config = await getAuthHeader();
-    console.log("Making API request to:", `${API_BASE_URL}/users/profile`);
     const response = await axios.get(`${API_BASE_URL}/users/profile`, config);
     return response.data;
   } catch (error) {

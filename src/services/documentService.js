@@ -31,7 +31,6 @@ export const uploadDocument = async (file, title) => {
     formData.append("file", file);
     formData.append("title", title);
 
-    console.log("Uploading document to:", `${API_BASE_URL}/documents/upload`);
     const response = await axios.post(
       `${API_BASE_URL}/documents/upload`,
       formData,
@@ -60,7 +59,6 @@ export const uploadDocument = async (file, title) => {
 export const getDocuments = async () => {
   try {
     const config = await getAuthHeader();
-    console.log("Fetching documents from:", `${API_BASE_URL}/documents/list`);
     const response = await axios.get(`${API_BASE_URL}/documents/list`, config);
     return response.data;
   } catch (error) {
@@ -79,10 +77,6 @@ export const getDocuments = async () => {
 export const chatWithDocument = async (documentId, message) => {
   try {
     const config = await getAuthHeader();
-    console.log(
-      "Sending chat message to:",
-      `${API_BASE_URL}/documents/chat/${documentId}`
-    );
     const response = await axios.post(
       `${API_BASE_URL}/documents/chat/${documentId}`,
       { message },
@@ -105,10 +99,6 @@ export const chatWithDocument = async (documentId, message) => {
 export const getChatHistory = async (documentId) => {
   try {
     const config = await getAuthHeader();
-    console.log(
-      "Fetching chat history from:",
-      `${API_BASE_URL}/documents/chat/${documentId}/history`
-    );
     const response = await axios.get(
       `${API_BASE_URL}/documents/chat/${documentId}/history`,
       config
@@ -130,12 +120,6 @@ export const getChatHistory = async (documentId) => {
 export const deleteDocument = async (documentId) => {
   try {
     const config = await getAuthHeader();
-    console.log(
-      "Deleting document:",
-      `${API_BASE_URL}/documents/${documentId}`
-    );
-
-    // This endpoint may need to be implemented in your backend
     const response = await axios.delete(
       `${API_BASE_URL}/documents/${documentId}`,
       config

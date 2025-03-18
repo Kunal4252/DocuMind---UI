@@ -1,5 +1,4 @@
-import "./App.css";
-import React from "react";
+import React, { Suspense } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -7,15 +6,22 @@ import {
   Navigate,
   Link,
 } from "react-router-dom";
+import { useAuth } from "./hooks/useAuth";
+import MainLayout from "./components/layouts/MainLayout";
+import SignUpPage from "./pages/SignUp.jsx";
+import SignInPage from "./pages/SignIn.jsx";
 import { Dashboard } from "./pages/Dashboard.jsx";
 import { Chat } from "./pages/Chat.jsx";
 import { Home } from "./pages/Home.jsx";
-import { SignUpPage } from "./pages/SignUp.jsx";
-import { SignInPage } from "./pages/SignIn.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { useAuth } from "./hooks/useAuth";
 import UserProfile from "./components/UserProfile";
-import MainLayout from "./components/layouts/MainLayout";
+
+// Loading component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center h-screen w-full">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+  </div>
+);
 
 // Simple Help page component
 const HelpPage = () => {

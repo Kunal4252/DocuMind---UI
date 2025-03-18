@@ -25,9 +25,7 @@ const DocumentChat = () => {
       setIsFetchingHistory(true);
       setError(null);
       try {
-        console.log("Fetching chat history for document:", selectedDocument.id);
         const response = await getChatHistory(selectedDocument.id);
-        console.log("Chat history response:", response);
         setChatHistory(response.chat_history || []);
       } catch (err) {
         console.error("Error fetching chat history:", err);
@@ -71,11 +69,7 @@ const DocumentChat = () => {
     setError(null);
 
     try {
-      console.log(
-        `Sending chat message to document ${selectedDocument.id}: ${message}`
-      );
       const response = await chatWithDocument(selectedDocument.id, message);
-      console.log("Chat response received:", response);
 
       // Update chat history with response
       setChatHistory((prev) => {

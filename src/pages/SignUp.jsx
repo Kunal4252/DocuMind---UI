@@ -5,7 +5,7 @@ import { signUpWithEmail, signInWithGoogle } from "../services/authService.js";
 import { useNavigate, Link } from "react-router-dom";
 import { FileText } from "lucide-react";
 
-export const SignUpPage = () => {
+const SignUpPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -51,7 +51,6 @@ export const SignUpPage = () => {
         const { email, password, name, phone, location, bio } = formData;
         const userData = { name, phone, location, bio };
         const response = await signUpWithEmail(email, password, userData);
-        console.log(response);
         navigate("/dashboard");
       } catch (error) {
         console.error("Sign-up error:", error);
@@ -87,7 +86,6 @@ export const SignUpPage = () => {
     setLoading(true);
     try {
       const response = await signInWithGoogle();
-      console.log(response);
       navigate("/dashboard");
     } catch (error) {
       console.error("Google sign-up error:", error);
@@ -300,3 +298,5 @@ export const SignUpPage = () => {
     </div>
   );
 };
+
+export default SignUpPage;
