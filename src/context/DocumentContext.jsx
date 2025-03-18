@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getDocuments } from "../services/documentService";
-import { useAuth } from "./authcontext";
+import { useAuth } from "../hooks/useAuth";
 
 const DocumentContext = createContext();
 

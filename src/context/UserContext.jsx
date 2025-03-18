@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getUserProfile } from "../services/userService";
-import { useAuth } from "./authcontext";
+import { useAuth } from "../hooks/useAuth";
 
 const UserContext = createContext();
 

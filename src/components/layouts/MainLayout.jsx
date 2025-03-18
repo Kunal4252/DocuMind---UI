@@ -1,16 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useUser } from "../../context/UserContext";
 import { logout } from "../../services/authService";
 import { NavLink } from "react-router-dom";
+import { FileText } from "lucide-react";
 
 const MainLayout = ({ children }) => {
   const { user } = useAuth();
   const { userProfile } = useUser();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const profileMenuRef = useRef(null);
+  const profileButtonRef = useRef(null);
   const navigate = useNavigate();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        profileMenuRef.current &&
+        !profileMenuRef.current.contains(event.target) &&
+        !profileButtonRef.current.contains(event.target)
+      ) {
+        setIsProfileMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -31,10 +52,13 @@ const MainLayout = ({ children }) => {
   return (
     <div className="min-h-screen h-screen bg-gray-50 flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="bg-white shadow-sm z-10 flex-shrink-0">
+      <header className="bg-white shadow-sm z-20 flex-shrink-0">
         <div className="w-full px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-indigo-600">DocuMind</h1>
+            <div className="flex items-center gap-2">
+              <FileText className="h-6 w-6 text-blue-600" />
+              <h1 className="text-2xl font-bold gradient-text">DocuMind AI</h1>
+            </div>
             <nav className="hidden md:flex space-x-4 ml-6">
               <NavLink
                 to="/dashboard"
@@ -72,6 +96,7 @@ const MainLayout = ({ children }) => {
           {/* Profile section */}
           <div className="relative">
             <button
+              ref={profileButtonRef}
               onClick={toggleProfileMenu}
               className="flex items-center space-x-2 p-2 rounded-full hover:bg-gray-100 focus:outline-none"
             >
@@ -84,7 +109,9 @@ const MainLayout = ({ children }) => {
                 {userProfile?.name || user?.email?.split("@")[0] || "User"}
               </span>
               <svg
-                className="h-5 w-5 text-gray-400 hidden md:block"
+                className={`h-5 w-5 text-gray-400 hidden md:block transition-transform duration-200 ${
+                  isProfileMenuOpen ? "rotate-180" : ""
+                }`}
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
                 fill="currentColor"
@@ -100,7 +127,11 @@ const MainLayout = ({ children }) => {
 
             {/* Profile dropdown */}
             {isProfileMenuOpen && (
-              <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+              <div
+                ref={profileMenuRef}
+                className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+                style={{ minWidth: "12rem" }}
+              >
                 <div className="py-1" role="menu" aria-orientation="vertical">
                   <button
                     onClick={() => {
@@ -137,8 +168,8 @@ const MainLayout = ({ children }) => {
         </div>
       </header>
 
-      {/* Main content - explicitly set to flex-1 and overflow-hidden */}
-      <main className="flex-1 flex overflow-hidden w-full">{children}</main>
+      {/* Main content - change to overflow-auto to enable scrolling */}
+      <main className="flex-1 flex overflow-auto w-full">{children}</main>
 
       {/* Footer - ensure it's flex-shrink-0 so it doesn't collapse */}
       <footer className="bg-white border-t border-gray-200 flex-shrink-0">
