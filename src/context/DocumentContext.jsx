@@ -38,6 +38,8 @@ export const DocumentProvider = ({ children }) => {
       setError(null);
       try {
         const response = await getDocuments();
+        // Print the full API response to the console
+        console.log("Document list API response:", response);
         const documentsList = response.documents || [];
         setDocuments(documentsList);
 
@@ -57,7 +59,7 @@ export const DocumentProvider = ({ children }) => {
     };
 
     fetchDocuments();
-  }, [user, refreshTrigger, selectedDocument]);
+  }, [user, refreshTrigger]);
 
   // Select a document by ID
   const selectDocument = (documentId) => {
@@ -68,6 +70,7 @@ export const DocumentProvider = ({ children }) => {
 
     const doc = documents.find((d) => d.id === documentId);
     setSelectedDocument(doc || null);
+    
   };
 
   // Clear selected document

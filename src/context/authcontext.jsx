@@ -15,6 +15,8 @@ export const AuthProvider = ({ children }) => {
       try {
         if (firebaseUser) {
           // Get the ID token
+          console.log(firebaseUser);
+
           const token = await firebaseUser.getIdToken();
 
           // Store user in state
